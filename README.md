@@ -14,10 +14,10 @@ From there the `up` script (`docker_tap_up.sh`) is used to bring the network int
 
 Once done the IP address `10.0.75.1` can be used as a network routing gateway to reach any containers within the Host Virutal Machine:
 ```
-route add -net <IP RANGE> -netmask <IP MASK> 10.0.75.1
+sudo route add -net <IP RANGE> -netmask <IP MASK> 10.0.75.1
 ```
 
-**Note:** With later versions of Docker, you will need to setup IP Forwarding in the iptables defintion on the Host Virtual Machine:  
+**Note:** With later versions of Docker, you will need to setup IP Forwarding in the iptables defintion on the Host Virtual Machine:
 (This is not done by the helpers as this is not a OSX or tuntap specific issue. You would need to do the same for Docker for Windows, as such it should be handled outside the scope of this project.)
 ```
 docker run --rm --privileged --pid=host debian nsenter -t 1 -m -u -n -i iptables -A FORWARD -i eth1 -j ACCEPT
@@ -29,7 +29,7 @@ Dependencies
 
 [TunTap](http://tuntaposx.sourceforge.net/)
 ```
-brew install tuntap
+brew cask install tuntap
 ```
 
 How to install it
