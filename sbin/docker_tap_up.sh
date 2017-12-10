@@ -8,7 +8,7 @@ localTapInterface=tap1
 hostTapInterface=eth1
 
 # Local and host gateway addresses
-localGateway='10.0.75.1'
+localGateway='10.0.75.1/24'
 hostGateway='10.0.75.2'
 
 # Startup local and host tuntap interfaces
