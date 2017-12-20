@@ -1,5 +1,5 @@
 docker-tuntap-osx
-=================
+================
 docker-tuntap-osx is a tuntap support shim installer for Docker for Mac.
 
 The Problem
@@ -56,6 +56,10 @@ And remove any backup files that may have been generated:
 ```
 rm /Applications/Docker.app/Contents/Resources/bin/hyperkit.<YYYYMMDD_HHMMSS>
 ```
+
+Projects using docker-tuntap-osx
+-----------------------------
+ * [helpers-docker](https://github.com/AlmirKadric-Published/helpers-docker-nodejs): Docker Helpers for Node.js
 
 License
 -------
