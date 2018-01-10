@@ -12,9 +12,9 @@ This installer (`docker_tap_install.sh`) will move the original hyperkit binary 
 
 From there the `up` script (`docker_tap_up.sh`) is used to bring the network interface up on both the Physical Machine and the Host Virtual Machine. Unlike the install script, which only needs to be run once, this `up` script must be run for every restart of the Host Virtual Machine.
 
-Once done the IP address `10.0.75.1` can be used as a network routing gateway to reach any containers within the Host Virutal Machine:
+Once done the IP address `10.0.75.2` can be used as a network routing gateway to reach any containers within the Host Virutal Machine:
 ```
-route add -net <IP RANGE> -netmask <IP MASK> 10.0.75.1
+route add -net <IP RANGE> -netmask <IP MASK> 10.0.75.2
 ```
 
 **Note:** With later versions of Docker, you will need to setup IP Forwarding in the iptables defintion on the Host Virtual Machine:  
