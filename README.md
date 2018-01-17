@@ -23,6 +23,11 @@ route add -net <IP RANGE> -netmask <IP MASK> 10.0.75.2
 docker run --rm --privileged --pid=host debian nsenter -t 1 -m -u -n -i iptables -A FORWARD -i eth1 -j ACCEPT
 ```
 
+**Note:** Although not required for docker-for-mac versions greater than `17.12.0`, the above command can be replaced with the following if ever needed and is tested to be working on docker-for-windwos as an alternative. This is in case docker-for-mac changes something in future and this command ends up being a necessity once again.
+```
+docker run --rm --privileged --pid=host docker4w/nsenter-dockerd /bin/sh -c 'iptables -A FORWARD -i eth1 -j ACCEPT'
+```
+
 Dependencies
 ------------
 [Docker for Mac](https://www.docker.com/docker-mac)
