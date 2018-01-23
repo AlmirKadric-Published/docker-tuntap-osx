@@ -17,10 +17,15 @@ Once done the IP address `10.0.75.2` can be used as a network routing gateway to
 route add -net <IP RANGE> -netmask <IP MASK> 10.0.75.2
 ```
 
-**Note:** With later versions of Docker, you will need to setup IP Forwarding in the iptables defintion on the Host Virtual Machine:  
+**Note:** Although as of docker-for-mac version `17.12.0` you do not need the following, for prior versions you will need to setup IP Forwarding in the iptables defintion on the Host Virtual Machine:  
 (This is not done by the helpers as this is not a OSX or tuntap specific issue. You would need to do the same for Docker for Windows, as such it should be handled outside the scope of this project.)
 ```
 docker run --rm --privileged --pid=host debian nsenter -t 1 -m -u -n -i iptables -A FORWARD -i eth1 -j ACCEPT
+```
+
+**Note:** Although not required for docker-for-mac versions greater than `17.12.0`, the above command can be replaced with the following if ever needed and is tested to be working on docker-for-windwos as an alternative. This is in case docker-for-mac changes something in future and this command ends up being a necessity once again.
+```
+docker run --rm --privileged --pid=host docker4w/nsenter-dockerd /bin/sh -c 'iptables -A FORWARD -i eth1 -j ACCEPT'
 ```
 
 Dependencies
