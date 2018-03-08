@@ -32,6 +32,9 @@ for possibleLocation in $(echo '
 	if [ -f "$possibleLocation" ]; then
 		hyperkitPath=$possibleLocation
 		break;
+    elif [ -f "$HOME/$possibleLocation" ]; then
+		hyperkitPath=$HOME/$possibleLocation
+		break;
 	fi
 done
 
