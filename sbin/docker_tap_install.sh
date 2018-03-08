@@ -27,10 +27,14 @@ fi
 hyperkitPath=false
 for possibleLocation in $(echo '
 	/Applications/Docker.app/Contents/MacOS/com.docker.hyperkit
+	/Applications/Docker.app/Contents/Resources/bin/com.docker.hyperkit
 	/Applications/Docker.app/Contents/Resources/bin/hyperkit
 '); do
 	if [ -f "$possibleLocation" ]; then
 		hyperkitPath=$possibleLocation
+		break;
+    elif [ -f "$HOME$possibleLocation" ]; then
+		hyperkitPath=$HOME$possibleLocation
 		break;
 	fi
 done
