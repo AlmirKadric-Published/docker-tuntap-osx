@@ -6,12 +6,6 @@ set -o errexit
 # Folder where this install script resides
 SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE}) && pwd)
 
-# Potential names the docker daemon process could have
-POSSIBLE_PROCESS_NAMES=$(echo '
-	com.docker.hyperkit
-	hyperkit.original
-')
-
 # Make sure tap interface we will bind to hyperkit VM is owned by us
 tapintf=tap1
 sudo chown $USER /dev/tap1
@@ -44,24 +38,6 @@ if [ "$hyperkitPath" = false ]; then
 	exit 1
 fi
 
-# Take note of the docker daemon process
-# NOTE: in some instances docker will automatically restart
-# after the below step, so we take note of it a bit earlier
-processID=false
-processName=false
-for possibleName in $POSSIBLE_PROCESS_NAMES; do
-	if pgrep -q $possibleName; then
-		processID=$(pgrep $possibleName)
-		processName=$possibleName
-		break;
-	fi
-done
-
-if [ "$processName" = false ]; then
-	echo 'Could not find hyperkit process to kill, make sure docker is running' >&2
-	exit 1;
-fi
-
 # Check if we have already been installed with the current version
 if file "$hyperkitPath" | grep -q 'executable, ASCII text$'; then
 	if cmp -s "$shimPath" "$hyperkitPath"; then
@@ -86,32 +62,8 @@ else
 fi
 
 # Restarting docker
-echo "Restarting process '$processName' [$processID]"
-pkill "$processName"
+echo "Restarting Docker"
+osascript -e 'quit app "Docker"'
 
-# Wait for process to come back online
-count=0
-while true; do
-	sleep 1;
-
-	newProcessID=false
-	for possibleName in $POSSIBLE_PROCESS_NAMES; do
-		if pgrep -q $possibleName; then
-			newProcessID=$(pgrep $possibleName)
-			break;
-		fi
-	done
-
-	if [ "$newProcessID" != false ] && [ "$newProcessID" != "$processID" ]; then
-		break;
-	fi
-
-	count=$(($count + 1))
-	if [ $count -gt 60 ]; then
-		echo "Failed to restart process '$processName'"
-		exit 1
-	fi
-done
-
-# All done!
-echo 'Process restarted, ready to go'
+open --background -a Docker
+echo 'Process restarting, ready to go'
