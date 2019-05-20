@@ -52,14 +52,9 @@ After this you will need to bring up the network interfaces every time the docke
 
 How to remove it
 ----------------
-Currently there is no uninstall script. However to remove the shim you simply need to move the original binary back to its original place:
+The uninstall script will simply revert the installer. Restoring the original and removing the shim:
 ```
-mv /Applications/Docker.app/Contents/Resources/bin/hyperkit.original /Applications/Docker.app/Contents/Resources/bin/hyperkit
-```
-
-And remove any backup files that may have been generated:
-```
-rm /Applications/Docker.app/Contents/Resources/bin/hyperkit.<YYYYMMDD_HHMMSS>
+./sbin/docker_tap_uninstall.sh
 ```
 
 Projects using docker-tuntap-osx
