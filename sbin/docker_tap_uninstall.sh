@@ -29,11 +29,15 @@ fi
 
 # Restore the original hyperkit executable
 if [ -f "${hyperkitPath}.original" ]; then
-	mv "${hyperkitPath}.original" "$hyperkitPath"
-	rm "${hyperkitPath}.*"
+	mv "${hyperkitPath}.original" "${hyperkitPath}"
 else
 	echo 'The hyperkit original was not found' >&1
 	exit 1
+fi
+
+# Remove backup files
+if [ -e "${hyperkitPath}."* ]; then
+	rm "${hyperkitPath}."*
 fi
 
 # Restarting docker
