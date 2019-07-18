@@ -39,7 +39,7 @@ if [ "$hyperkitPath" = false ]; then
 fi
 
 # Check if we have already been installed with the current version
-if file "$hyperkitPath" | grep -q 'executable, ASCII text$'; then
+if file "$hyperkitPath" | grep -Eiq '(Bourne-Again shell script|text executable|ASCII text)'; then
 	if cmp -s "$shimPath" "$hyperkitPath"; then
 		echo 'Already installed';
 		if ! echo $@ | grep -q '\-f'; then
