@@ -13,16 +13,16 @@ for possibleLocation in $(echo '
 	/Applications/Docker.app/Contents/Resources/bin/com.docker.hyperkit
 	/Applications/Docker.app/Contents/Resources/bin/hyperkit
 '); do
-	if [ -f "$possibleLocation" ]; then
-		hyperkitPath=$possibleLocation
+	if [ -f "${possibleLocation}" ]; then
+		hyperkitPath=${possibleLocation}
 		break;
-    elif [ -f "$HOME$possibleLocation" ]; then
-		hyperkitPath=$HOME$possibleLocation
+    elif [ -f "${HOME}${possibleLocation}" ]; then
+		hyperkitPath=${HOME}${possibleLocation}
 		break;
 	fi
 done
 
-if [ "$hyperkitPath" = false ]; then
+if [ "${hyperkitPath}" = false ]; then
 	echo 'Could not find hyperkit executable' >&2
 	exit 1
 fi
