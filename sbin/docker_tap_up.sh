@@ -15,3 +15,6 @@ hostNetmask='255.255.255.252'
 # Startup local and host tuntap interfaces
 sudo ifconfig $localTapInterface $localGateway up
 docker run --rm --privileged --net=host --pid=host alpine ifconfig $hostTapInterface $hostGateway netmask $hostNetmask up
+
+# Add route to container network
+sudo route add -net 172.20.0.0/16 10.0.75.2
