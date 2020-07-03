@@ -34,7 +34,6 @@ Dependencies
 
 [TunTap](http://tuntaposx.sourceforge.net/)
 ```
-brew tap caskroom/cask
 brew cask install tuntap
 ```
 
