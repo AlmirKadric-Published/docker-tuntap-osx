@@ -3,10 +3,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-log() {
-  echo "$(date +%Y-%d-%mT%H:%M:%S) $1"
-}
-
 subnet_for() {
 	local network=$1
 
@@ -19,25 +15,19 @@ add_route_for() {
 	sudo route add -net "$subnet" 10.0.75.2
 }
 
-delete_route_for() {
-	local network=$1
-	local subnet; subnet=$(subnet_for "$network")
-	echo sudo route delete "$subnet"
-}
-
-listen_to_network_events() {
-	docker events --filter 'type=network' --format '{{.Action}} {{index .Actor.Attributes "type"}} {{.ID}}' | \
-	while read -r event; do
-		IFS=' ' read -r action type network <<< "$event"
-		if [ "$type" = "bridge" ]; then
-			"${action}_route_for" "$network"
-		fi
-	done
+add_routes_for_new_networks() {
+	docker events --filter 'type=network' --filter 'event=create' --format '{{index .Actor.Attributes "type"}} {{.ID}}' | \
+		while read -r event; do
+			IFS=' ' read -r type network <<< "$event"
+			if [ "$type" = "bridge" ]; then
+				add_route_for "$network"
+			fi
+		done
 }
 
 main() {
 
-	listen_to_network_events &
+	add_routes_for_new_networks &
 
   local networks; networks=$(docker network ls --filter driver=bridge --format '{{.ID}}')
   for network in $networks; do
