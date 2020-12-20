@@ -13,12 +13,19 @@ subnet_for() {
 	docker network inspect "$network" --format '{{(index .IPAM.Config 0).Subnet}}'
 }
 
+tap1_exists() {
+	ifconfig -r tap1 2> /dev/null | grep 10.0.75.1 > /dev/null
+}
+
 add_route_for() {
 	local network=$1
-	local subnet; subnet=$(subnet_for "$network")
-	# I'd like this to only work if it would be on netif tap1, but don't know how...
-	# Doesn't fail if route already exists
-	sudo route add -net "$subnet" 10.0.75.2
+	if tap1_exists; then
+		local subnet; subnet=$(subnet_for "$network")
+		# Doesn't fail if route already exists
+		sudo route add -net "$subnet" 10.0.75.2
+	else
+		echo "Not adding a route for $network because tap1 interface does not exist"
+	fi
 }
 
 add_routes_for_new_networks() {
