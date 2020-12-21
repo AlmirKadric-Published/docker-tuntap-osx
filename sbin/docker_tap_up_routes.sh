@@ -30,7 +30,7 @@ add_route_for() {
 		# Doesn't fail if route already exists
 		sudo route add -net "$subnet" 10.0.75.2
 	else
-		log "Not adding a route for $network because tap1 interface does not exist"
+		log "Not adding a route for $subnet because tap1 interface does not exist"
 	fi
 }
 
