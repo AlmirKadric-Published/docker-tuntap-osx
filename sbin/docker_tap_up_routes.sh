@@ -3,6 +3,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Set home so docker doesn't moan
+export HOME="${HOME:-/var/root}"
+
 log() {
   echo "$(date +%Y-%d-%mT%H:%M:%S) $1"
 }
