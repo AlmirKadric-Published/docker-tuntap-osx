@@ -66,34 +66,18 @@ get_existing_routes() {
 	done
 }
 
-is_subnet_of_docker_network() {
-	local docker_subnets=$1
-	local existing_route=$2
-	echo "$docker_subnets" | grep "$existing_route" 1>/dev/null
+contains() {
+	local items=$1
+	local item=$2
+	echo "$items" | grep "$item" 1>/dev/null
 }
 
-find_routes_to_delete() {
-	local existing_routes=$1
-	local docker_subnets=$2
-	for existing_route in $existing_routes; do
-  	if ! is_subnet_of_docker_network "$docker_subnets" "$existing_route"; then
-  		echo "$existing_route"
-		fi
-	done
-}
-
-is_subnet_of_route() {
-	local existing_routes=$1
-	local docker_subnet=$2
-	echo "$existing_routes" | grep "$docker_subnet" 1>/dev/null
-}
-
-find_routes_to_add() {
-	local existing_routes=$1
-	local docker_subnets=$2
-	for docker_subnet in $docker_subnets; do
-  	if ! is_subnet_of_route "$existing_routes" "$docker_subnet"; then
-  		echo "$docker_subnet"
+not_in() {
+	local items=$1
+	local candidates=$2
+	for candidate in $candidates; do
+  	if ! contains "$items" "$candidate"; then
+  		echo "$candidate"
 		fi
 	done
 }
@@ -102,7 +86,7 @@ delete_unused_routes() {
 	local docker_subnets=$1
   local existing_routes=$2
 
-  local routes_to_delete; routes_to_delete=$(find_routes_to_delete "$existing_routes" "$docker_subnets")
+  local routes_to_delete; routes_to_delete=$(not_in "$docker_subnets" "$existing_routes")
   for route_to_delete in $routes_to_delete; do
   	sudo route rm "$route_to_delete"
 	done
@@ -112,7 +96,7 @@ add_missing_routes() {
 	local docker_subnets=$1
   local existing_routes=$2
 
-	local routes_to_add; routes_to_add=$(find_routes_to_add "$existing_routes" "$docker_subnets")
+	local routes_to_add; routes_to_add=$(not_in "$existing_routes" "$docker_subnets")
   for route_to_add in $routes_to_add; do
   	add_route_for "$route_to_add"
 	done
