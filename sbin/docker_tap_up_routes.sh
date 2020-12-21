@@ -63,7 +63,7 @@ to_full_subnet() {
 }
 
 get_existing_route_subnets() {
-	local route_subnets; route_subnets=$(netstat -nr -f inet | grep tap1 | grep 10.0.75.2 | cut -d' ' -f1)
+	local route_subnets; route_subnets=$(netstat -nr -f inet | grep tap1 | grep 10.0.75.2 | grep UGSc | cut -d' ' -f1)
 	for route_subnet in $route_subnets; do
 	  to_full_subnet "$route_subnet"
 	done
