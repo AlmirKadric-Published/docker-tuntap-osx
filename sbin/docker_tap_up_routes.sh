@@ -32,14 +32,14 @@ add_route_for() {
 }
 
 
-get_all_networks() {
+get_all_docker_bridge_networks() {
 	docker network ls \
 	  --filter 'driver=bridge' \
 	  --format '{{.ID}}'
 }
 
-get_all_docker_network_subnets() {
-	local docker_networks; docker_networks=$(get_all_networks)
+get_all_docker_bridge_network_subnets() {
+	local docker_networks; docker_networks=$(get_all_docker_bridge_networks)
 	for network in $docker_networks; do
   	subnet_for "$network"
 	done
@@ -59,7 +59,7 @@ to_full_subnet() {
 		fi
 }
 
-get_existing_routes() {
+get_existing_route_subnets() {
 	local route_subnets; route_subnets=$(netstat -nr -f inet | grep tap1 | grep 10.0.75.2 | cut -d' ' -f1)
 	for route_subnet in $route_subnets; do
 	  to_full_subnet "$route_subnet"
@@ -83,20 +83,20 @@ not_in() {
 }
 
 delete_unused_routes() {
-	local docker_subnets=$1
-  local existing_routes=$2
+	local docker_bridge_network_subnets=$1
+  local existing_route_subnets=$2
 
-  local routes_to_delete; routes_to_delete=$(not_in "$docker_subnets" "$existing_routes")
+  local routes_to_delete; routes_to_delete=$(not_in "$docker_bridge_network_subnets" "$existing_route_subnets")
   for route_to_delete in $routes_to_delete; do
-  	sudo route rm "$route_to_delete"
+  	sudo route delete "$route_to_delete"
 	done
 }
 
 add_missing_routes() {
-	local docker_subnets=$1
-  local existing_routes=$2
+	local docker_bridge_network_subnets=$1
+  local existing_route_subnets=$2
 
-	local routes_to_add; routes_to_add=$(not_in "$existing_routes" "$docker_subnets")
+	local routes_to_add; routes_to_add=$(not_in "$existing_route_subnets" "$docker_bridge_network_subnets")
   for route_to_add in $routes_to_add; do
   	add_route_for "$route_to_add"
 	done
@@ -113,7 +113,7 @@ update_routes_as_networks_change() {
 							local subnet; subnet=$(subnet_for "$network")
 							add_route_for "$subnet"
 						elif [ "$action" = 'destroy' ]; then
-							delete_unused_routes "$(get_all_docker_network_subnets)" "$(get_existing_routes)"
+							delete_unused_routes "$(get_all_docker_bridge_network_subnets)" "$(get_existing_route_subnets)"
 						else
 							log "Skipping action [$action] for network [$network] of type [$type] - we only react to create and destroy actions"
 						fi
@@ -124,11 +124,11 @@ update_routes_as_networks_change() {
 }
 
 synchronize_networks() {
-	local docker_subnets; docker_subnets=$(get_all_docker_network_subnets)
-  local existing_routes; existing_routes=$(get_existing_routes)
+	local docker_bridge_network_subnets; docker_bridge_network_subnets=$(get_all_docker_bridge_network_subnets)
+  local existing_route_subnets; existing_route_subnets=$(get_existing_route_subnets)
 
-  delete_unused_routes "$docker_subnets" "$existing_routes"
-  add_missing_routes "$docker_subnets" "$existing_routes"
+  delete_unused_routes "$docker_bridge_network_subnets" "$existing_route_subnets"
+  add_missing_routes "$docker_bridge_network_subnets" "$existing_route_subnets"
 }
 
 main() {
