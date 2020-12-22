@@ -29,6 +29,7 @@ add_route_for() {
 	if tap1_exists; then
 		# Doesn't fail if route already exists
 		sudo route add -net "$subnet" 10.0.75.2
+		log "Added a route to $subnet via gateway 10.0.75.2"
 	else
 		log "Not adding a route for $subnet because tap1 interface does not exist"
 	fi
@@ -92,6 +93,7 @@ delete_unused_routes() {
   local routes_to_delete; routes_to_delete=$(not_in "$docker_bridge_network_subnets" "$existing_route_subnets")
   for route_to_delete in $routes_to_delete; do
   	sudo route delete "$route_to_delete"
+  	log "Deleted route to $subnet"
 	done
 }
 
@@ -108,6 +110,8 @@ add_missing_routes() {
 update_routes_as_networks_change() {
 	docker events \
 	  --filter 'type=network' \
+	  --filter 'event=create' \
+	  --filter 'event=destroy' \
 	  --format '{{.Action}} {{index .Actor.Attributes "type"}} {{.Actor.ID}}' \
 		  | while read -r event; do
 					IFS=' ' read -r action type network <<< "$event"
@@ -115,10 +119,8 @@ update_routes_as_networks_change() {
 						if [ "$action" = 'create' ]; then
 							local subnet; subnet=$(subnet_for "$network")
 							add_route_for "$subnet"
-						elif [ "$action" = 'destroy' ]; then
-							delete_unused_routes "$(get_all_docker_bridge_network_subnets)" "$(get_existing_route_subnets)"
 						else
-							log "Skipping action [$action] for network [$network] of type [$type] - we only react to create and destroy actions"
+							delete_unused_routes "$(get_all_docker_bridge_network_subnets)" "$(get_existing_route_subnets)"
 						fi
 					else
 						log "Skipping action [$action] for network [$network] of type [$type] - we only create routes for bridge networks"
