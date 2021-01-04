@@ -7,7 +7,7 @@ IFS=$'\n\t'
 export HOME="${HOME:-/var/root}"
 
 log() {
-  echo "$(date +%Y-%d-%mT%H:%M:%S) $1"
+  echo "$(date +%Y-%d-%mT%H:%M:%S%Z) $1"
 }
 
 subnet_for() {
