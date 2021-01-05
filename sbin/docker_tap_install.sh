@@ -4,11 +4,7 @@ set -o nounset
 set -o errexit
 
 # Folder where this install script resides
-SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE}) && pwd)
-
-# Make sure tap interface we will bind to hyperkit VM is owned by us
-tapintf=tap1
-sudo chown ${USER} /dev/tap1
+SCRIPT_DIR=/usr/local/opt/docker-tuntap-osx/sbin
 
 # Make sure shim script we will install exists
 shimPath="${SCRIPT_DIR}/docker.hyperkit.tuntap.sh"
@@ -26,9 +22,6 @@ for possibleLocation in $(echo '
 '); do
 	if [ -f "${possibleLocation}" ]; then
 		hyperkitPath=${possibleLocation}
-		break;
-    elif [ -f "${HOME}${possibleLocation}" ]; then
-		hyperkitPath=${HOME}${possibleLocation}
 		break;
 	fi
 done
@@ -60,6 +53,7 @@ if file "${hyperkitPath}" | grep -Eiq '(Bourne-Again shell script|text executabl
 elif file "${hyperkitPath}" | grep -q 'Mach-O.*executable'; then
 	mv "${hyperkitPath}" "${hyperkitPath}.original"
 	cp "${shimPath}" "${hyperkitPath}"
+	chown -n "$(stat -L -f '%u:%g' "${hyperkitPath}.original")" "${hyperkitPath}"
 	chmod +x "${hyperkitPath}"
 	echo 'Installation complete'
 else
