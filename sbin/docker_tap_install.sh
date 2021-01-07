@@ -38,7 +38,9 @@ if file "${hyperkitPath}" | grep -Eiq '(Bourne-Again shell script|text executabl
 			echo 'Already installed';
 			if ! echo $@ | grep -q '\-f'; then
 				echo 'Use "-f" argument if you want to restart hyperkit anyway'
-				exit 0
+				if iconfig tap1; then
+					exit 0
+				fi
 			fi
 		else
 			chmod +x "${hyperkitPath}"
