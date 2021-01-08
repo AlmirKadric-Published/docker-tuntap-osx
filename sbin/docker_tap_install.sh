@@ -26,6 +26,9 @@ for possibleLocation in $(echo '
 	fi
 done
 
+# Make sure tap interface we will bind to hyperkit VM is owned by us
+sudo chown -n "$(stat -L -f '%u' "$hyperkitPath")" /dev/tap1
+
 if [ "${hyperkitPath}" = false ]; then
 	echo 'Could not find hyperkit executable' >&2
 	exit 1
@@ -49,6 +52,7 @@ if file "${hyperkitPath}" | grep -Eiq '(Bourne-Again shell script|text executabl
 		timestamp=$(date +%Y%m%d_%H%M%S)
 		mv "${hyperkitPath}" "${hyperkitPath}.${timestamp}"
 		cp "${shimPath}" "${hyperkitPath}"
+		chown -n "$(stat -L -f '%u:%g' "${hyperkitPath}.original")" "${hyperkitPath}"
 		chmod +x "${hyperkitPath}"
 		echo 'Updated existing installation'
 	fi
